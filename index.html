@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQLD 1일차 데이터 모델링 & 엔터티 마스터 퀴즈</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Pretendard', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="p-2 bg-blue-100 text-blue-600 rounded-lg">
+          <i data-lucide="database" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold text-slate-900">SQLD 1일차 데일리 복습</h1>
+          <p class="text-xs text-slate-500">데이터 모델링 & 엔터티 완벽 마스터</p>
+        </div>
+      </div>
+      <div class="text-xs font-semibold px-3 py-1 bg-slate-100 text-slate-600 rounded-full flex items-center gap-1.5">
+        <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+        <span>1c15f3fa-4bcf-4652-becd-85860e55fc25_2026-07-11_SQLD_수업_1일차__.pdf 기준</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="flex-grow max-w-4xl w-full mx-auto px-4 py-8">
+    
+    <!-- 1. Start Screen -->
+    <div id="start-screen" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 text-center max-w-2xl mx-auto my-8">
+      <div class="w-20 h-20 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6">
+        <i data-lucide="award" class="w-10 h-10"></i>
+      </div>
+      <h2 class="text-2xl font-extrabold text-slate-900 mb-2">실전 SQLD 자격증 대비 퀴즈</h2>
+      <p class="text-slate-600 mb-6 text-sm leading-relaxed">
+        오늘 공부한 내용을 확실하게 암기하셨나요? <br>
+        실제 시험의 객관식 유형과 난이도로 출제된 10문항을 풀며 취약점을 파악해 보세요. <br>
+        힌트 없이 진행되며 제출 즉시 상세한 오답 분석과 피드백을 제공합니다.
+      </p>
+      
+      <div class="grid grid-cols-2 gap-4 max-w-md mx-auto mb-8 text-left text-xs text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-200">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500"></i>
+          <span>실전 객관식 10문항</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <i data-lucide="x-circle" class="w-4 h-4 text-rose-500"></i>
+          <span>힌트 미제공 모드</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <i data-lucide="hash" class="w-4 h-4 text-indigo-500"></i>
+          <span>발생시점/형태별 엔터티 분류</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <i data-lucide="refresh-cw" class="w-4 h-4 text-amber-500"></i>
+          <span>무제한 오답노트 학습</span>
+        </div>
+      </div>
+
+      <button onclick="startQuiz()" class="w-full sm:w-auto px-8 py-3 bg-slate-900 text-white rounded-xl font-semibold hover:bg-slate-800 transition duration-200 flex items-center justify-center space-x-2 mx-auto">
+        <span>퀴즈 시작하기</span>
+        <i data-lucide="arrow-right" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <!-- 2. Quiz Playing Screen -->
+    <div id="quiz-screen" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- Progress and navigation list (Sidebar on desktop) -->
+      <div class="lg:col-span-4 bg-white rounded-2xl border border-slate-200 p-6 self-start">
+        <h3 class="font-bold text-slate-900 mb-4 flex items-center gap-2">
+          <i data-lucide="list-checks" class="w-5 h-5 text-indigo-500"></i>
+          문항 진행 현황
+        </h3>
+        <div class="grid grid-cols-5 gap-2 mb-6" id="progress-indicator">
+          <!-- Populated by JS -->
+        </div>
+        <div class="border-t border-slate-100 pt-4 text-xs text-slate-500 space-y-2">
+          <div class="flex justify-between">
+            <span>남은 문제수:</span>
+            <span id="remaining-count" class="font-semibold text-slate-700">10개</span>
+          </div>
+          <div class="flex justify-between">
+            <span>총점 가중치:</span>
+            <span class="font-semibold text-slate-700">각 10점</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Question Card -->
+      <div class="lg:col-span-8 flex flex-col space-y-6">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500"></div>
+          
+          <!-- Question Header -->
+          <div class="flex justify-between items-center mb-6">
+            <span class="px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-semibold uppercase tracking-wider" id="question-category">
+              SQLD 단골 유형
+            </span>
+            <span class="text-sm font-medium text-slate-500" id="current-index-display">Question 1 of 10</span>
+          </div>
+
+          <!-- Question Body -->
+          <h2 class="text-lg sm:text-xl font-bold text-slate-900 mb-6 leading-relaxed" id="question-text">
+            데이터 모델링의 세 가지 유의사항 중, 데이터가 언제나 서로 모순되지 않고 일정한 상태를 유지해야 함을 의미하는 용어는 무엇인가?
+          </h2>
+
+          <!-- Options Form -->
+          <div class="space-y-3" id="options-container">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-between items-center">
+          <button id="prev-btn" onclick="prevQuestion()" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl font-medium hover:bg-slate-50 transition flex items-center gap-2">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            <span>이전 문항</span>
+          </button>
+          
+          <button id="next-btn" onclick="nextQuestion()" class="px-5 py-2.5 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 transition flex items-center gap-2">
+            <span id="next-btn-text">다음 문항</span>
+            <i data-lucide="arrow-right" class="w-4 h-4" id="next-btn-icon"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Result & Incorrect Review Screen -->
+    <div id="result-screen" class="hidden max-w-3xl mx-auto space-y-8">
+      
+      <!-- Score Dashboard -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 text-center">
+        <div class="inline-flex items-center justify-center relative mb-4">
+          <!-- Circular Progress SVG -->
+          <svg class="w-32 h-32 transform -rotate-90">
+            <circle cx="64" cy="64" r="54" stroke-width="8" stroke="#e2e8f0" fill="transparent" />
+            <circle cx="64" cy="64" r="54" stroke-width="8" stroke="#3b82f6" fill="transparent" 
+              stroke-dasharray="339.29" id="score-circle-bar" />
+          </svg>
+          <div class="absolute text-center">
+            <span class="text-3xl font-extrabold text-slate-900" id="score-text">0</span>
+            <span class="text-sm font-semibold text-slate-400">/ 100</span>
+          </div>
+        </div>
+
+        <h2 class="text-2xl font-bold text-slate-900 mb-2" id="score-message">멋진 도전이었습니다!</h2>
+        <p class="text-slate-500 text-sm max-w-md mx-auto mb-6" id="score-submessage">
+          틀린 문항을 다시 학습하여 취약한 데이터 모델링 이론을 다듬어 보세요.
+        </p>
+
+        <div class="flex flex-wrap gap-4 justify-center">
+          <button onclick="restartQuiz()" class="px-5 py-2.5 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 transition flex items-center gap-2">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            <span>다시 풀기</span>
+          </button>
+          <button onclick="scrollToReview()" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl font-medium hover:bg-slate-50 transition flex items-center gap-2">
+            <i data-lucide="clipboard-list" class="w-4 h-4 text-indigo-500"></i>
+            <span>상세 오답노트 보기</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Incorrect Answer / Full Review Section -->
+      <div id="review-section" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-4 mb-6 gap-4">
+          <div>
+            <h3 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <i data-lucide="check-square" class="text-blue-500 w-6 h-6"></i>
+              오답노트 및 풀이 리뷰
+            </h3>
+            <p class="text-xs text-slate-400 mt-1">풀이 결과를 누르면 언제든지 상세 해설을 확인할 수 있습니다.</p>
+          </div>
+          
+          <!-- Filters for View -->
+          <div class="flex space-x-1 bg-slate-100 p-1 rounded-lg text-xs font-semibold">
+            <button onclick="filterReview('all')" id="filter-all-btn" class="px-3 py-1.5 rounded-md bg-white text-slate-800 shadow-sm">
+              전체 보기 (<span id="count-all">10</span>)
+            </button>
+            <button onclick="filterReview('incorrect')" id="filter-incorrect-btn" class="px-3 py-1.5 rounded-md text-slate-500 hover:text-slate-800">
+              틀린 문제만 (<span id="count-incorrect">0</span>)
+            </button>
+          </div>
+        </div>
+
+        <!-- Rendered Review Container -->
+        <div class="space-y-6" id="review-container">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-6">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+      <p class="text-xs text-slate-400 leading-relaxed">
+        본 복습 문항은 교안 <strong class="text-slate-600">1c15f3fa-4bcf-4652-becd-85860e55fc25_2026-07-11_SQLD_수업_1일차__.pdf</strong>의 이론적 틀을 기반으로 자체 제작되었습니다.
+      </p>
+      <p class="text-[10px] text-slate-300 mt-1">© 2026 SQLD Master Prep. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Quiz Script Logic -->
+  <script>
+    // 10 Selected High-Quality SQLD Practice Questions based on PDF Day 1 Study
+    const quizData = [
+      {
+        id: 1,
+        category: "데이터 모델링 개념",
+        question: "데이터 모델링 시 가장 경계해야 하는 유의사항 중, 중복된 정보를 배제하고 한 곳에서만 관리하여 원천 데이터의 불일치 현상을 방지하고자 하는 모델링 원칙은 무엇인가?",
+        options: [
+          "유연성 (Flexibility)",
+          "유일성 (Uniqueness)",
+          "일관성 (Consistency)",
+          "안정성 (Stability)"
+        ],
+        answer: 1, // 0-indexed: Uniqueness
+        explanation: "교재 p.2에 명시된 내용입니다. '유일성(Uniqueness)'은 같은 정보는 오직 한 곳에서만 정의·관리하여 불필요한 중복 발생을 사전에 제거하는 원칙을 의미합니다. 일관성은 데이터가 모순되지 않고 논리적으로 일정한 상태를 유지해야 함을 나타냅니다."
+      },
+      {
+        id: 2,
+        category: "모델링의 관점",
+        question: "데이터 모델링의 세 가지 관점 중, '업무 과정에서 실제로 무엇(What)을 영구히 저장하고 비즈니스 흐름에서 구조화해야 하는가'를 기술하는 분석 관점은 무엇인가?",
+        options: [
+          "데이터 관점 (Data View)",
+          "프로세스 관점 (Process View)",
+          "상관 관점 (Correlation View)",
+          "논리적 관점 (Logical View)"
+        ],
+        answer: 0,
+        explanation: "교재 p.2에 따른 모델링의 3대 관점 중 '데이터 관점'은 'What' 즉, 저장해야 하는 정보와 사물 자체를 분석하는 관점이며, '프로세스 관점'은 업무 상 실질적으로 수행하는 과정인 'How'에 중점을 둡니다. 상관 관점은 데이터와 프로세스 간의 연결관계를 연구합니다."
+      },
+      {
+        id: 3,
+        category: "모델링 3단계",
+        question: "데이터 모델링의 3단계 중, 정규화(Normalization)를 적극 수행하며 재사용성이 높고 비즈니스 요건이 명확히 상세화된 모델을 도출하는 단계이자, 특정 특정 DBMS 장비에 대해 완전히 독립적인 독립성을 보장하는 단계는 무엇인가?",
+        options: [
+          "개념적 데이터 모델링",
+          "논리적 데이터 모델링",
+          "물리적 데이터 모델링",
+          "구조적 데이터 모델링"
+        ],
+        answer: 1,
+        explanation: "교재 p.2에 명시된 정규화 단계를 수행하는 중간 지점은 '논리적 데이터 모델링'입니다. 특정 DBMS 기기에 의존하지 않으면서 가장 정교한 비즈니스 로직과 외래키 연관성을 완벽히 매핑하는 핵심적이고 독자적인 모델 설계 단계입니다."
+      },
+      {
+        id: 4,
+        category: "ANSI-SPARC 구조",
+        question: "ANSI-SPARC 3단계 구조 중, 데이터베이스의 전체적이고 통합된 논리 구조를 전사적인(Global) 관점에서 단 하나로 정교하게 기술하며, 사용자 데이터 관계 및 무결성 규칙을 선언하는 중심적 성격의 스키마는?",
+        options: [
+          "외부 스키마 (External Schema)",
+          "물리 스키마 (Physical Schema)",
+          "내부 스키마 (Internal Schema)",
+          "개념 스키마 (Conceptual Schema)"
+        ],
+        answer: 3,
+        explanation: "교재 p.4에 따르면 개념 스키마(Conceptual Schema)는 통합 관점으로 모든 사용자의 데이터를 통합하여 전체 DB의 논리 구조를 기술하며 무결성 규칙을 포함하고 있습니다. 보통 전체 DB에 단 하나만 정의되는 시스템의 핵심입니다."
+      },
+      {
+        id: 5,
+        category: "데이터 독립성",
+        question: "다음 중 물리적 데이터 독립성(Physical Data Independence)이 올바르게 보장되었을 때 유도되는 아키텍처 상의 특징에 부합하는 설명은?",
+        options: [
+          "테이블의 논리적 컬럼 구조가 추가되더라도 기존 사용자의 편의성을 위한 외부 뷰 스키마는 전혀 수정될 필요가 없다.",
+          "인덱스의 추가, 디스크 보관 경로 변경, 혹은 파티션 적용과 같이 실제 내부 저장 방식(내부 스키마)을 완전히 바꾸어도, 개념적 논리 구조(개념 스키마)에는 아무런 악영향을 유발하지 않는다.",
+          "하드웨어와 DBMS가 완전히 일치하여 두 계층이 긴밀하게 일관적인 물리적 디펜던시를 갖는다.",
+          "물리 저장 구조를 변경하면 반드시 모든 외부 뷰 단에서 수정을 연쇄적으로 반영해주어야 원천 에러를 회피할 수 있다."
+        ],
+        answer: 1,
+        explanation: "교재 p.5~6에 따르면 물리적 데이터 독립성은 내부 스키마(물리 저장 구조)가 전면 변경(디스크 이관, 인덱싱 재구축 등)되어도, 논리 구조인 개념 스키마가 전혀 영향을 받지 않는 것입니다. 1번 선택지는 논리적 데이터 독립성에 해당합니다."
+      },
+      {
+        id: 6,
+        category: "엔터티의 특징",
+        question: "다음 중 업무적으로 중요한 정보를 담는 단위인 엔터티(Entity)가 반드시 가져야 하는 정체성적 특성으로 가장 옳지 않은 설명은?",
+        options: [
+          "해당 업무 비즈니스 맥락에서 명확하게 필요로 하고 장기적으로 관리되어야 한다.",
+          "엔터티는 고유하게 실체를 식별할 수 있는 Primary Key 등의 식별자를 가질 수 있어야 한다.",
+          "유일성을 위해 한 번 테이블로 결정되면 영구적으로 존재하는 단 1개의 인스턴스(Instance) 레코드 구조를 가져야만 성립된다.",
+          "반드시 데이터 항목인 속성(Attribute)을 구성원으로서 보유하여야 하며 비즈니스 상에 가치 있는 의미를 포함한다."
+        ],
+        answer: 2,
+        explanation: "교재 p.8~9에 따르면 엔터티는 무조건 2개 이상의 인스턴스(데이터 행)를 가져야 합니다. 만약 데이터가 단 1개의 인스턴스만 보관된다면 이는 독립된 독립 엔터티로서 구축될 정체성 요건을 상실하여 성립되지 않습니다."
+      },
+      {
+        id: 7,
+        category: "엔터티 실체 분류",
+        question: "엔터티의 실체 형태(물리적 가시성)에 따라 분류할 때, 물리적 객체가 눈에 보이진 않지만 비즈니스 체계 내에서 추상적이자 장기 지속적으로 실존하며 존재의 타당성을 가지는 '개념적 무형 엔터티'의 구체적 조합인 것은?",
+        options: [
+          "사원, 고객, 차량, 부품",
+          "결제, 계약, 입고, 주문취소",
+          "계좌, 보험상품, 개설학과, 등록과목",
+          "배송지, 제조공장, 지점, 영수증"
+        ],
+        answer: 2,
+        explanation: "교재 p.10에 따르면 실질적 물리 실체가 없지만 지속성을 확보하고 시스템 상에서 설계되는 '개념 엔터티(무형)'의 대표 사례로 계좌, 보험, 학과, 과목 등이 나열되어 있습니다. 1번은 유형 엔터티, 2번은 실제 발생하는 행위에 연계되는 사건 엔터티(행위 엔터티)에 가깝습니다."
+      },
+      {
+        id: 8,
+        category: "엔터티 발생시점 분류",
+        question: "엔터티의 비즈니스 도출 시점에 따라 분류하는 3대 개념 중, '두 개 이상의 부모 기본 테이블로부터 유도되어 다량의 대용량 트랜잭션과 일시적인 프로세스 처리 및 흐름에 따라 활발하게 축적되며, 실제 운영 시 저장 용량이 가장 방대한 비중을 차지하는 것'은?",
+        options: [
+          "기본 엔터티 (Base Entity)",
+          "중심 엔터티 (Main Entity)",
+          "행위 엔터티 (Action Entity)",
+          "종속 엔터티 (Dependent Entity)"
+        ],
+        answer: 2,
+        explanation: "교재 p.11에 나와 있는 엔터티 발생 분류 중 '행위 엔터티(Action Entity)'에 해당합니다. 프로세스나 상태 변화, 비즈니스 흐름 속에서 다수 부모 엔터티와의 연동을 거치며 실시간으로 데이터 볼륨이 극도로 늘어나는 특성을 보입니다."
+      },
+      {
+        id: 9,
+        category: "ERD 작성 프로세스",
+        question: "교재에서 제안하는 관계형 다이어그램인 ERD(Entity Relationship Diagram)를 작성해 나가는 단계적인 정석 작업 순서로 올바르게 표시된 것은?",
+        options: [
+          "엔터티 도출 → 관계 설정 → 엔터티 배치 → 관계명 기술 → 관계 차수 설정 → 선택성 기재",
+          "엔터티 도출 → 엔터티 배치 → 관계 설정 → 관계명 기술 → 관계 차수 설정 → 선택사항 기술",
+          "엔터티 배치 → 엔터티 도출 → 관계 설정 → 관계 차수 설정 → 선택성 기재 → 관계명 기술",
+          "관계 설정 → 엔터티 도출 → 엔터티 배치 → 관계명 기술 → 선택사항 기술 → 관계 차수 설정"
+        ],
+        answer: 1,
+        explanation: "교재 p.8의 상세 표에 따르면 ERD 구축 순서는 다음과 같습니다: ① 엔터티 도출 → ② 엔터티 배치 → ③ 관계 설정 → ④ 관계명 기술 → ⑤ 관계 차수(1:N 등) 설정 → ⑥ 선택사항(필수/선택) 기술."
+      },
+      {
+        id: 10,
+        category: "엔터티-속성-인스턴스",
+        question: "다음 중 데이터 모델링의 중심 구성요소인 엔터티(Entity), 속성(Attribute), 인스턴스(Instance)의 특징과 상호 상관성에 대한 교재 이론적 설명으로 가장 어긋난 설명은?",
+        options: [
+          "속성은 엔터티의 가치를 더해주는 하위 세부 데이터 항목이며, 실제 테이블의 컬럼(Column) 구조로 완벽히 대응되어 매핑된다.",
+          "인스턴스는 설계된 엔터티 내 속성 항목들에 현실세계의 구체적인 데이터를 대입하여 가로 한 줄로 고유 식별되도록 삽입된 실제 로우(Row) 레코드를 가리킨다.",
+          "하나의 엔터티에는 최소한 1개의 인스턴스 정보만 존재해도 정규 구조상 오류 없이 성립하는 완벽한 엔터티로 판별한다.",
+          "엔터티가 도출되기 위해서는 현실 비즈니스 업무 흐름(Business Process)에서 해당 데이터를 실질적으로 활용하는 유의미함이 반드시 증명되어야 한다."
+        ],
+        answer: 2,
+        explanation: "교재 p.8~9의 '엔터티가 되려면?' 가이드에 나와 있듯이, 엔터티로서 정상 판정되기 위해서는 반드시 '2개 이상의 인스턴스(데이터 레코드)'를 상주시켜야 합니다. 오직 단 1개의 인스턴스로 끝나는 정체성 없는 개념은 독립 개체(엔터티)로 인정하지 않습니다."
+      }
+    ];
+
+    let currentIdx = 0;
+    let userAnswers = Array(quizData.length).fill(null);
+    let quizCompleted = false;
+
+    // Initialize Page Elements on Load
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+    });
+
+    // Start Quiz Execution
+    function startQuiz() {
+      document.getElementById('start-screen').classList.add('hidden');
+      document.getElementById('quiz-screen').classList.remove('hidden');
+      renderProgressDots();
+      loadQuestion(0);
+    }
+
+    // Render Progress indicators
+    function renderProgressDots() {
+      const container = document.getElementById('progress-indicator');
+      container.innerHTML = '';
+      quizData.forEach((q, idx) => {
+        const dot = document.createElement('button');
+        dot.type = 'button';
+        dot.id = `dot-${idx}`;
+        dot.className = `w-full aspect-square flex items-center justify-center rounded-lg font-bold text-sm transition-all border ${
+          idx === currentIdx 
+            ? 'bg-indigo-600 text-white border-indigo-600 ring-2 ring-indigo-300' 
+            : userAnswers[idx] !== null 
+              ? 'bg-slate-100 text-slate-800 border-slate-300' 
+              : 'bg-white text-slate-400 border-slate-200 hover:border-slate-300'
+        }`;
+        dot.textContent = idx + 1;
+        dot.onclick = () => {
+          if (!quizCompleted) loadQuestion(idx);
+        };
+        container.appendChild(dot);
+      });
+      
+      const answeredCount = userAnswers.filter(ans => ans !== null).length;
+      document.getElementById('remaining-count').textContent = `${10 - answeredCount}개`;
+    }
+
+    // Load Specific Question Card
+    function loadQuestion(idx) {
+      currentIdx = idx;
+      const q = quizData[idx];
+      
+      // Update Texts
+      document.getElementById('question-category').textContent = q.category;
+      document.getElementById('current-index-display').textContent = `문제 ${idx + 1} / ${quizData.length}`;
+      document.getElementById('question-text').textContent = q.question;
+      
+      // Render Options
+      const optionsContainer = document.getElementById('options-container');
+      optionsContainer.innerHTML = '';
+      
+      q.options.forEach((opt, optIdx) => {
+        const isSelected = userAnswers[idx] === optIdx;
+        
+        const optBtn = document.createElement('div');
+        optBtn.className = `flex items-start p-4 border rounded-xl cursor-pointer transition-all duration-150 ${
+          isSelected 
+            ? 'border-indigo-600 bg-indigo-50/50 ring-1 ring-indigo-500' 
+            : 'border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300'
+        }`;
+        optBtn.onclick = () => selectOption(optIdx);
+        
+        optBtn.innerHTML = `
+          <div class="flex items-center justify-center w-6 h-6 rounded-full border mr-3 mt-0.5 flex-shrink-0 ${
+            isSelected 
+              ? 'border-indigo-600 bg-indigo-600 text-white' 
+              : 'border-slate-300 bg-white text-slate-400'
+          }">
+            <span class="text-xs font-bold">${optIdx + 1}</span>
+          </div>
+          <p class="text-slate-700 font-medium text-sm leading-relaxed">${opt}</p>
+        `;
+        optionsContainer.appendChild(optBtn);
+      });
+
+      // Manage Previous Button state
+      const prevBtn = document.getElementById('prev-btn');
+      if (idx === 0) {
+        prevBtn.classList.add('opacity-50', 'pointer-events-none');
+      } else {
+        prevBtn.classList.remove('opacity-50', 'pointer-events-none');
+      }
+
+      // Handle Next / Finish button style
+      const nextBtnText = document.getElementById('next-btn-text');
+      const nextIcon = document.getElementById('next-btn-icon');
+      
+      if (idx === quizData.length - 1) {
+        nextBtnText.textContent = "최종 답안 제출";
+        nextIcon.setAttribute('data-lucide', 'check-all');
+      } else {
+        nextBtnText.textContent = "다음 문항";
+        nextIcon.setAttribute('data-lucide', 'arrow-right');
+      }
+      lucide.createIcons();
+      renderProgressDots();
+    }
+
+    // Handle Option Selection
+    function selectOption(optIdx) {
+      userAnswers[currentIdx] = optIdx;
+      loadQuestion(currentIdx);
+    }
+
+    // Go to Prev Question
+    function prevQuestion() {
+      if (currentIdx > 0) {
+        loadQuestion(currentIdx - 1);
+      }
+    }
+
+    // Go to Next or Submit
+    function nextQuestion() {
+      if (currentIdx < quizData.length - 1) {
+        loadQuestion(currentIdx + 1);
+      } else {
+        // Trigger Submit validation
+        submitQuiz();
+      }
+    }
+
+    // Submit and Calculate Score
+    function submitQuiz() {
+      // Check if all are answered
+      const unanswered = [];
+      userAnswers.forEach((ans, index) => {
+        if (ans === null) unanswered.push(index + 1);
+      });
+
+      if (unanswered.length > 0) {
+        const confirmSubmit = confirm(`아직 풀지 않은 문제가 있습니다 (미답 문제: ${unanswered.join(', ')}번)\n그래도 그냥 제출하고 결과를 확인하시겠습니까?`);
+        if (!confirmSubmit) return;
+      }
+
+      quizCompleted = true;
+      showResults();
+    }
+
+    // Show Results Panel
+    function showResults() {
+      document.getElementById('quiz-screen').classList.add('hidden');
+      document.getElementById('result-screen').classList.remove('hidden');
+
+      // Calculate score
+      let correctCount = 0;
+      quizData.forEach((q, idx) => {
+        if (userAnswers[idx] === q.answer) {
+          correctCount++;
+        }
+      });
+
+      const finalScore = correctCount * 10;
+      
+      // Update circular bar stroke dashoffset
+      // Circumference = 2 * Math.PI * 54 ≈ 339.29
+      const progressPercent = finalScore / 100;
+      const offset = 339.29 - (progressPercent * 339.29);
+      document.getElementById('score-circle-bar').style.strokeDashoffset = offset;
+      
+      // Update Score text
+      document.getElementById('score-text').textContent = finalScore;
+
+      // Header comment logic
+      const messageEl = document.getElementById('score-message');
+      const submessageEl = document.getElementById('score-submessage');
+      
+      if (finalScore === 100) {
+        messageEl.textContent = "완벽합니다! SQLD 마스터 수준!";
+        submessageEl.textContent = "1일차 데이터 모델링 & 엔터티 이론을 완벽하게 이해하셨습니다! 실전에서 만점을 노려보세요.";
+      } else if (finalScore >= 80) {
+        messageEl.textContent = "훌륭한 합격권 점수입니다!";
+        submessageEl.textContent = "일부 실수를 보완하시면 본 고사에서 안정적인 합격선 통과가 예상되는 우수한 실력입니다.";
+      } else if (finalScore >= 60) {
+        messageEl.textContent = "조금만 더 보강하면 통과!";
+        submessageEl.textContent = "SQLD 과락을 넘기는 수준이지만 안심하긴 이릅니다. 오답노트를 통해 개념을 완전히 숙지하세요.";
+      } else {
+        messageEl.textContent = "집중 보강 및 복습이 절대 필요합니다!";
+        submessageEl.textContent = "교재 이론이 아직 충분히 정리되지 않은 상태입니다. 오답 분석을 면밀히 검토해 보시길 권장합니다.";
+      }
+
+      // Generate incorrect notes and full list
+      renderReviewList();
+      lucide.createIcons();
+    }
+
+    // Render detailed feedback cards with styling for wrong/correct
+    function renderReviewList() {
+      const container = document.getElementById('review-container');
+      container.innerHTML = '';
+      
+      let incorrectCount = 0;
+
+      quizData.forEach((q, idx) => {
+        const userSelection = userAnswers[idx];
+        const isCorrect = userSelection === q.answer;
+        if (!isCorrect) incorrectCount++;
+
+        const card = document.createElement('div');
+        card.className = `review-item border rounded-2xl p-6 transition-all duration-200 ${
+          isCorrect 
+            ? 'border-emerald-100 bg-emerald-50/20' 
+            : 'border-rose-100 bg-rose-50/20'
+        }`;
+        card.setAttribute('data-correct', isCorrect ? 'true' : 'false');
+
+        // Layout options HTML
+        let optionsHtml = '';
+        q.options.forEach((opt, optIdx) => {
+          let optionClass = 'border-slate-100 text-slate-600 bg-white';
+          let statusBadge = '';
+
+          // User selected this and it was correct
+          if (optIdx === q.answer) {
+            optionClass = 'border-emerald-200 bg-emerald-50 text-emerald-800 ring-1 ring-emerald-400 font-medium';
+            statusBadge = `<span class="ml-auto text-xs font-semibold px-2.5 py-0.5 bg-emerald-100 text-emerald-700 rounded-full flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5"></i>정답</span>`;
+          } else if (optIdx === userSelection && !isCorrect) {
+            optionClass = 'border-rose-200 bg-rose-50 text-rose-800 ring-1 ring-rose-400 font-medium';
+            statusBadge = `<span class="ml-auto text-xs font-semibold px-2.5 py-0.5 bg-rose-100 text-rose-700 rounded-full flex items-center gap-1"><i data-lucide="x" class="w-3.5 h-3.5"></i>선택한 오답</span>`;
+          }
+
+          optionsHtml += `
+            <div class="flex items-center p-3 border rounded-xl text-xs sm:text-sm ${optionClass}">
+              <div class="w-5 h-5 rounded-full border flex items-center justify-center mr-2 text-xs font-bold ${
+                optIdx === q.answer ? 'bg-emerald-500 border-emerald-500 text-white' : optIdx === userSelection ? 'bg-rose-500 border-rose-500 text-white' : 'border-slate-300'
+              }">
+                ${optIdx + 1}
+              </div>
+              <span class="flex-grow pr-4">${opt}</span>
+              ${statusBadge}
+            </div>
+          `;
+        });
+
+        card.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+            <span class="px-2.5 py-1 bg-slate-200 text-slate-700 text-xs font-bold rounded-lg">${q.category}</span>
+            <div class="flex items-center space-x-2 text-xs font-semibold ${isCorrect ? 'text-emerald-600' : 'text-rose-600'}">
+              <i data-lucide="${isCorrect ? 'check-circle' : 'alert-circle'}" class="w-4 h-4"></i>
+              <span>${isCorrect ? '정답' : '오답'} (문제 ${idx + 1})</span>
+            </div>
+          </div>
+          
+          <h4 class="text-sm sm:text-base font-bold text-slate-900 mb-4 leading-relaxed">${q.question}</h4>
+          
+          <div class="space-y-2 mb-4">
+            ${optionsHtml}
+          </div>
+
+          <!-- Explanation Box -->
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+            <div class="flex items-center gap-1.5 text-xs font-bold text-indigo-600 mb-1.5 uppercase">
+              <i data-lucide="lightbulb" class="w-4 h-4"></i>
+              <span>정밀 출제 해설</span>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">${q.explanation}</p>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+
+      // Update counters in tab filters
+      document.getElementById('count-all').textContent = quizData.length;
+      document.getElementById('count-incorrect').textContent = incorrectCount;
+    }
+
+    // Filter review items ('all' vs 'incorrect' only)
+    function filterReview(mode) {
+      const items = document.querySelectorAll('.review-item');
+      const allBtn = document.getElementById('filter-all-btn');
+      const incorrectBtn = document.getElementById('filter-incorrect-btn');
+
+      if (mode === 'all') {
+        allBtn.className = "px-3 py-1.5 rounded-md bg-white text-slate-800 shadow-sm";
+        incorrectBtn.className = "px-3 py-1.5 rounded-md text-slate-500 hover:text-slate-800";
+        items.forEach(item => item.classList.remove('hidden'));
+      } else {
+        incorrectBtn.className = "px-3 py-1.5 rounded-md bg-white text-slate-800 shadow-sm";
+        allBtn.className = "px-3 py-1.5 rounded-md text-slate-500 hover:text-slate-800";
+        items.forEach(item => {
+          if (item.getAttribute('data-correct') === 'true') {
+            item.classList.add('hidden');
+          } else {
+            item.classList.remove('hidden');
+          }
+        });
+      }
+    }
+
+    // Scroll smoothly to review card section
+    function scrollToReview() {
+      document.getElementById('review-section').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Reset whole quiz status
+    function restartQuiz() {
+      currentIdx = 0;
+      userAnswers = Array(quizData.length).fill(null);
+      quizCompleted = false;
+      document.getElementById('result-screen').classList.add('hidden');
+      document.getElementById('quiz-screen').classList.remove('hidden');
+      loadQuestion(0);
+    }
+  </script>
+</body>
+</html>
