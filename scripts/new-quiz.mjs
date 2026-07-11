@@ -25,6 +25,8 @@ for (const key of required) {
   }
 }
 
+const SITE_URL = 'https://anywaysoul92.github.io/sqld-quiz';
+
 const outFile = `day${data.day}.html`;
 const template = fs.readFileSync(path.join(rootDir, 'template.html'), 'utf8');
 
@@ -34,6 +36,9 @@ const html = template
   .replaceAll('{{HEADER_SUBTITLE}}', data.headerSubtitle)
   .replaceAll('{{PDF_NAME}}', data.pdfName)
   .replaceAll('{{QUESTION_COUNT}}', String(data.questions.length))
+  .replaceAll('{{OG_DESCRIPTION}}', data.hub.desc)
+  .replaceAll('{{PAGE_URL}}', `${SITE_URL}/${outFile}`)
+  .replaceAll('{{OG_IMAGE_URL}}', `${SITE_URL}/og-image.png`)
   .replace('{{QUIZ_DATA_JSON}}', JSON.stringify(data.questions, null, 2));
 
 fs.writeFileSync(path.join(rootDir, outFile), html);
