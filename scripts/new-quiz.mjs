@@ -65,12 +65,12 @@ if (cardBlockRegex.test(indexHtml)) {
   indexHtml = indexHtml.replace(cardBlockRegex, `\n${card}`);
   console.log(`Updated existing card for ${outFile} in index.html`);
 } else {
-  const marker = '<!-- 다음 회차 추가 시 이 자리에 카드를 복사해서 붙여넣고 day2.html 등으로 연결하세요 -->';
+  const marker = '<!-- NEW_QUIZ_CARD_MARKER: scripts/new-quiz.mjs가 다음 회차 카드를 이 자리에 자동 삽입합니다 -->';
   if (!indexHtml.includes(marker)) {
     console.error('Could not find insertion marker in index.html');
     process.exit(1);
   }
-  indexHtml = indexHtml.replace(marker, `${card}\n\n      ${marker}`);
+  indexHtml = indexHtml.replace(marker, `${card.trimStart()}\n\n      ${marker}`);
   console.log(`Added new card for ${outFile} to index.html`);
 }
 
