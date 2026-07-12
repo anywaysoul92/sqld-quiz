@@ -80,6 +80,10 @@
           <i data-lucide="refresh-cw" class="w-4 h-4 text-amber-500"></i>
           <span>무제한 오답노트 학습</span>
         </div>
+        <div class="flex items-center space-x-2 col-span-2 pt-3 mt-1 border-t border-slate-200">
+          <i data-lucide="timer" class="w-4 h-4 text-rose-500"></i>
+          <span>문항당 제한시간 90초 — 시간 초과 시 자동으로 다음 문항 이동</span>
+        </div>
       </div>
 
       <button onclick="startQuiz()" class="w-full sm:w-auto px-8 py-3 bg-slate-900 text-white rounded-xl font-semibold hover:bg-slate-800 transition duration-200 flex items-center justify-center space-x-2 mx-auto">
@@ -122,7 +126,13 @@
             <span class="px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-semibold uppercase tracking-wider" id="question-category">
               SQLD 단골 유형
             </span>
-            <span class="text-sm font-medium text-slate-500" id="current-index-display">Question 1 of 10</span>
+            <div class="flex items-center gap-3">
+              <span id="question-timer" class="flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 transition-colors">
+                <i data-lucide="timer" class="w-3.5 h-3.5"></i>
+                <span id="question-timer-text">1:30</span>
+              </span>
+              <span class="text-sm font-medium text-slate-500" id="current-index-display">Question 1 of 10</span>
+            </div>
           </div>
 
           <!-- Question Body -->
@@ -372,6 +382,55 @@
       return min > 0 ? `${min}분 ${sec}초` : `${sec}초`;
     }
 
+    // Per-question countdown: SQLD 실제 시험 페이스(90분/50문항 ≈ 1.5분)에 맞춘 문항당 제한시간
+    const QUESTION_TIME_LIMIT_SEC = 90;
+    let questionTimerInterval = null;
+    let questionDeadline = null;
+
+    function formatCountdown(sec) {
+      const clamped = Math.max(0, sec);
+      const min = Math.floor(clamped / 60);
+      const s = clamped % 60;
+      return `${min}:${String(s).padStart(2, '0')}`;
+    }
+
+    function updateQuestionTimerUI(remainingSec) {
+      const badgeEl = document.getElementById('question-timer');
+      const textEl = document.getElementById('question-timer-text');
+      if (!badgeEl || !textEl) return;
+      textEl.textContent = formatCountdown(remainingSec);
+      badgeEl.classList.remove('bg-slate-100', 'text-slate-500', 'bg-amber-100', 'text-amber-700', 'bg-rose-100', 'text-rose-700', 'animate-pulse');
+      if (remainingSec <= 10) {
+        badgeEl.classList.add('bg-rose-100', 'text-rose-700', 'animate-pulse');
+      } else if (remainingSec <= 20) {
+        badgeEl.classList.add('bg-amber-100', 'text-amber-700');
+      } else {
+        badgeEl.classList.add('bg-slate-100', 'text-slate-500');
+      }
+    }
+
+    function startQuestionTimer() {
+      clearInterval(questionTimerInterval);
+      questionDeadline = Date.now() + QUESTION_TIME_LIMIT_SEC * 1000;
+      updateQuestionTimerUI(QUESTION_TIME_LIMIT_SEC);
+      questionTimerInterval = setInterval(() => {
+        const remaining = Math.ceil((questionDeadline - Date.now()) / 1000);
+        if (remaining <= 0) {
+          clearInterval(questionTimerInterval);
+          questionTimerInterval = null;
+          updateQuestionTimerUI(0);
+          nextQuestion(); // 시간 초과: 다음 문항으로 자동 이동 (마지막 문항이면 자동 제출)
+          return;
+        }
+        updateQuestionTimerUI(remaining);
+      }, 250);
+    }
+
+    function stopQuestionTimer() {
+      clearInterval(questionTimerInterval);
+      questionTimerInterval = null;
+    }
+
     // Initialize Page Elements on Load
     window.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
@@ -417,6 +476,7 @@
       // Time tracking: bank elapsed time onto the question we're leaving,
       // then start (or resume) the clock for the incoming one.
       const now = Date.now();
+      const isNewQuestion = questionEnterTime === null || idx !== currentIdx;
       if (questionEnterTime !== null) {
         questionTimes[currentIdx] += now - questionEnterTime;
       }
@@ -479,6 +539,10 @@
       }
       lucide.createIcons();
       renderProgressDots();
+
+      if (isNewQuestion) {
+        startQuestionTimer();
+      }
     }
 
     // Handle Option Selection
@@ -518,6 +582,7 @@
       }
 
       quizCompleted = true;
+      stopQuestionTimer();
 
       // Bank the time for whichever question was on screen at submit, then lock the clock.
       if (questionEnterTime !== null) {
