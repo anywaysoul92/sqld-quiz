@@ -1,0 +1,127 @@
+{
+  "day": 3,
+  "pdfName": "2026-07-18_SQLD_(SQLPlus_CRUD_SQL_Developer_사용)_.pdf",
+  "pageTitle": "SQLD 3일차 SQL 기초·CRUD·NULL 함수 마스터 퀴즈",
+  "headerTitle": "SQLD 3일차 데일리 복습",
+  "headerSubtitle": "SQLPlus·CRUD 기초 + NULL 함수(NVL/COALESCE) 집중",
+  "hub": {
+    "badge": "3일차",
+    "title": "SQL 기초·CRUD·NULL 함수",
+    "desc": "DDL/DML/DCL/TCL, TRUNCATE/DROP, SQL 실행순서, NULL 처리 등 쿼리 실습형 10문항"
+  },
+  "questions": [
+    {
+      "category": "TRUNCATE vs DROP",
+      "question": "TRUNCATE TABLE과 DROP TABLE 명령어의 차이에 대한 설명으로 가장 옳지 않은 것은?",
+      "options": [
+        "TRUNCATE는 테이블의 데이터(행)만 삭제하고 테이블 구조는 그대로 남는다.",
+        "DROP은 테이블 구조 자체를 삭제하므로 이후 재사용하려면 테이블을 다시 생성해야 한다.",
+        "TRUNCATE로 삭제한 데이터는 일반적으로 ROLLBACK으로 복구할 수 있다.",
+        "TRUNCATE를 실행하면 자동 증가하는 식별자(ID) 값이 다시 초기값부터 시작된다."
+      ],
+      "answer": 2,
+      "explanation": "TRUNCATE는 DDL 명령으로 실행 즉시 반영되며, 일반적으로 ROLLBACK으로 되돌릴 수 없습니다. 반면 나머지 설명(데이터만 삭제되고 구조는 유지, DROP은 구조 자체 삭제, 자동 증가 ID 초기화)은 모두 옳습니다."
+    },
+    {
+      "category": "SQL 언어 분류 (DDL/DML/DCL/TCL)",
+      "question": "다음 SQL 명령어들을 종류별로 짝지은 것으로 가장 옳지 않은 것은?",
+      "code": "CREATE, ALTER, DROP, TRUNCATE\nSELECT, INSERT, UPDATE, DELETE\nGRANT, REVOKE\nCOMMIT, ROLLBACK, SAVEPOINT",
+      "options": [
+        "CREATE, ALTER, DROP, TRUNCATE → DDL(데이터 정의어)",
+        "SELECT, INSERT, UPDATE, DELETE → DML(데이터 조작어)",
+        "GRANT, REVOKE → TCL(트랜잭션 제어어)",
+        "COMMIT, ROLLBACK, SAVEPOINT → TCL(트랜잭션 제어어)"
+      ],
+      "answer": 2,
+      "explanation": "GRANT, REVOKE는 사용자 권한을 부여·회수하는 DCL(데이터 제어어) 명령어입니다. TCL(트랜잭션 제어어)은 COMMIT, ROLLBACK, SAVEPOINT처럼 트랜잭션 작업을 확정하거나 취소하는 명령어를 의미합니다."
+    },
+    {
+      "category": "SQL 실행 순서",
+      "question": "다음 SQL문의 실제 처리(실행) 순서를 옳게 나열한 것은?",
+      "code": "SELECT DEPT, AVG(SCORE)\nFROM STUDENT\nWHERE GRADE = 1\nGROUP BY DEPT\nHAVING AVG(SCORE) >= 80\nORDER BY DEPT;",
+      "options": [
+        "SELECT → FROM → WHERE → GROUP BY → HAVING → ORDER BY",
+        "FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY",
+        "FROM → SELECT → WHERE → GROUP BY → HAVING → ORDER BY",
+        "WHERE → FROM → GROUP BY → SELECT → HAVING → ORDER BY"
+      ],
+      "answer": 1,
+      "explanation": "SQL은 작성 순서와 달리 FROM(테이블 확인) → WHERE(행 필터링) → GROUP BY(그룹화) → HAVING(그룹 조건) → SELECT(컬럼 선택) → ORDER BY(정렬) 순서로 실제 처리됩니다."
+    },
+    {
+      "category": "CASE WHEN 실행 결과",
+      "question": "아래 PERSON 테이블과 쿼리가 있을 때, 실행 결과로 옳은 것은?",
+      "code": "CREATE TABLE PERSON(ID NUMBER, NAME VARCHAR2(10), AGE NUMBER);\nINSERT INTO PERSON VALUES(1, '이민호', 20);\nINSERT INTO PERSON VALUES(2, '정채연', 25);\nINSERT INTO PERSON VALUES(3, '신동엽', 33);\n\nSELECT ID,\n  CASE\n    WHEN AGE >= 30 THEN '중년'\n    WHEN AGE >= 20 THEN '청년'\n    ELSE '미성년'\n  END AS AGE_GROUP\nFROM PERSON;",
+      "options": [
+        "ID 1, 2, 3 모두 '청년'으로 조회된다.",
+        "ID 1='청년', ID 2='청년', ID 3='중년'으로 조회된다.",
+        "ID 1='미성년', ID 2='청년', ID 3='중년'으로 조회된다.",
+        "모든 행이 WHEN 조건 중 하나에도 해당하지 않아 오류가 발생한다."
+      ],
+      "answer": 1,
+      "explanation": "CASE WHEN은 위에서부터 순서대로 조건을 검사해 처음 만족하는 조건의 결과를 반환합니다. AGE=20과 25는 첫 조건(AGE>=30)에는 해당하지 않지만 두 번째 조건(AGE>=20)을 만족해 '청년'이 되고, AGE=33은 첫 조건을 만족해 '중년'이 됩니다."
+    },
+    {
+      "category": "NVL 타입 불일치",
+      "question": "HEIGHT 컬럼이 NUMBER 타입인 PERSON 테이블에서, 다음 중 타입 불일치로 오류가 발생하는 쿼리는?",
+      "code": "① SELECT NVL(HEIGHT, 0) FROM PERSON;\n② SELECT NVL(HEIGHT, '빈값') FROM PERSON;\n③ SELECT COALESCE(HEIGHT, 0) FROM PERSON;\n④ SELECT NVL(HEIGHT, 0) + 1 FROM PERSON;",
+      "options": ["①", "②", "③", "④"],
+      "answer": 1,
+      "explanation": "NVL(및 COALESCE)의 대체값은 원래 컬럼과 데이터 타입이 일치해야 합니다. HEIGHT는 NUMBER 타입인데 ②는 대체값으로 문자열 '빈값'을 지정해 타입 불일치 오류가 발생합니다. ①, ③, ④는 모두 숫자를 대체값·연산에 사용해 문제가 없습니다."
+    },
+    {
+      "category": "NULL 비교 문법",
+      "question": "다음 중 문법적으로 올바르게 작성된 쿼리는?",
+      "code": "① SELECT * FROM STUDENT WHERE SCORE = NULL;\n② SELECT * FROM STUDENT WHERE SCORE <> NULL;\n③ SELECT * FROM STUDENT WHERE SCORE IS NULL;\n④ SELECT * FROM STUDENT WHERE SCORE == NULL;",
+      "options": ["①", "②", "③", "④"],
+      "answer": 2,
+      "explanation": "NULL은 '알 수 없음' 상태이므로 =, <>, == 같은 일반 비교 연산자로 판별할 수 없습니다. NULL 여부를 확인할 때는 반드시 IS NULL / IS NOT NULL 문법을 사용해야 합니다."
+    },
+    {
+      "category": "오라클 암시적 형변환",
+      "question": "다음 오라클 쿼리의 실행 결과에 대한 설명으로 가장 옳은 것은? (SVC_NO 컬럼 값은 문자열 '001')",
+      "code": "SELECT * FROM SERVICE WHERE SVC_NO = 1;",
+      "options": [
+        "문자열과 숫자를 비교했으므로 반드시 오류가 발생한다.",
+        "오라클이 문자열 '001'을 숫자로 암시적 형변환(TO_NUMBER)하여 1과 비교하므로 조건이 참이 될 수 있다.",
+        "숫자 1이 문자열 '1'로 자동 변환되어 '001'과 문자열 비교되므로 항상 거짓이다.",
+        "오라클은 암시적 형변환을 지원하지 않으므로 이 조건은 항상 거짓이다."
+      ],
+      "answer": 1,
+      "explanation": "오라클은 문자열과 숫자를 비교할 때 문자열을 숫자로 암시적으로 형변환(TO_NUMBER)합니다. '001'은 TO_NUMBER('001')=1로 변환되어 1과 비교되므로 조건이 참이 될 수 있습니다."
+    },
+    {
+      "category": "집계함수와 NULL",
+      "question": "아래 TAB_A 테이블에 데이터를 입력한 후 쿼리를 실행하면 결과는?",
+      "code": "CREATE TABLE TAB_A(COL1 NUMBER, COL2 NUMBER, COL3 NUMBER);\nINSERT INTO TAB_A VALUES(30, NULL, 20);\nINSERT INTO TAB_A VALUES(NULL, 50, 10);\nINSERT INTO TAB_A VALUES(0, 10, NULL);\n\nSELECT SUM(COL2) + SUM(COL3) FROM TAB_A;",
+      "options": ["60", "80", "90", "NULL"],
+      "answer": 2,
+      "explanation": "SUM은 NULL을 제외하고 합산합니다. SUM(COL2)=50+10=60, SUM(COL3)=20+10=30이므로 SUM(COL2)+SUM(COL3)=60+30=90입니다."
+    },
+    {
+      "category": "행 단위 연산과 NULL",
+      "question": "위 TAB_A 테이블에서 다음 두 쿼리의 실행 결과를 비교한 설명으로 가장 옳은 것은?",
+      "code": "① SELECT SUM(COL2) + SUM(COL3) FROM TAB_A;\n② SELECT SUM(COL2 + COL3) FROM TAB_A;",
+      "options": [
+        "COL2, COL3 모두 같은 테이블의 컬럼이므로 ①과 ②의 결과는 항상 같다.",
+        "①은 각 컬럼의 합을 따로 구해 NULL을 무시한 뒤 더하지만, ②는 행 단위로 먼저 더해서 한쪽이라도 NULL이면 그 행 전체가 NULL 처리되어 합계에서 제외되므로 결과가 다를 수 있다.",
+        "②는 문법 오류이므로 실행되지 않는다.",
+        "①은 NULL이 하나라도 있으면 전체 결과가 NULL이 된다."
+      ],
+      "answer": 1,
+      "explanation": "①은 SUM(COL2)와 SUM(COL3)을 각각 계산할 때 NULL을 제외하고 합산한 뒤 더해 90이 됩니다. 반면 ②는 행마다 COL2+COL3을 먼저 계산하므로 한쪽이 NULL이면 그 행의 결과가 NULL이 되어 집계에서 빠지고(두 번째 행 60만 남음), 결과는 60이 되어 ①과 달라집니다."
+    },
+    {
+      "category": "NULL과 빈 문자열",
+      "question": "NULL과 빈 문자열('')의 관계에 대한 설명으로 가장 옳은 것은?",
+      "options": [
+        "모든 DBMS에서 NULL과 ''은 항상 동일하게 취급된다.",
+        "오라클(Oracle)은 NULL과 ''을 사실상 동일하게 취급하는 반면, SQL Server 등은 NULL(값 없음)과 ''(길이가 0인 값이 있는 상태)을 다르게 구분한다.",
+        "SQL Server는 NULL과 ''을 항상 동일하게 취급하고, 오라클은 이 둘을 엄격히 구분한다.",
+        "NULL과 ''은 두 값 모두 숫자 0과 동일하게 처리된다."
+      ],
+      "answer": 1,
+      "explanation": "오라클은 NULL과 빈 문자열('')을 사실상 같은 '값 없음' 상태로 취급하는 반면, SQL Server 같은 DBMS는 NULL(값 자체가 없음)과 ''(길이 0인 값이 존재)을 서로 다른 상태로 엄격히 구분합니다. 숫자 0과는 둘 다 무관합니다."
+    }
+  ]
+}

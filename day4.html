@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SQLD 1일차 데이터 모델링 & 엔터티 마스터 퀴즈</title>
-  <meta name="description" content="모델링 유의사항, 3단계, ANSI-SPARC, 엔터티 분류 등 10문항">
+  <title>SQLD 4일차 문자·숫자 함수 & GROUP BY 마스터 퀴즈</title>
+  <meta name="description" content="문자/숫자 내장함수, IN 연산자, GROUP BY/HAVING, ROLLUP·CUBE 등 쿼리 실습형 10문항">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="SQLD 복습 퀴즈">
-  <meta property="og:title" content="SQLD 1일차 데이터 모델링 & 엔터티 마스터 퀴즈">
-  <meta property="og:description" content="모델링 유의사항, 3단계, ANSI-SPARC, 엔터티 분류 등 10문항">
-  <meta property="og:url" content="https://anywaysoul92.github.io/sqld-quiz/day1.html">
+  <meta property="og:title" content="SQLD 4일차 문자·숫자 함수 & GROUP BY 마스터 퀴즈">
+  <meta property="og:description" content="문자/숫자 내장함수, IN 연산자, GROUP BY/HAVING, ROLLUP·CUBE 등 쿼리 실습형 10문항">
+  <meta property="og:url" content="https://anywaysoul92.github.io/sqld-quiz/day4.html">
   <meta property="og:image" content="https://anywaysoul92.github.io/sqld-quiz/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="SQLD 1일차 데이터 모델링 & 엔터티 마스터 퀴즈">
-  <meta name="twitter:description" content="모델링 유의사항, 3단계, ANSI-SPARC, 엔터티 분류 등 10문항">
+  <meta name="twitter:title" content="SQLD 4일차 문자·숫자 함수 & GROUP BY 마스터 퀴즈">
+  <meta name="twitter:description" content="문자/숫자 내장함수, IN 연산자, GROUP BY/HAVING, ROLLUP·CUBE 등 쿼리 실습형 10문항">
   <meta name="twitter:image" content="https://anywaysoul92.github.io/sqld-quiz/og-image.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
@@ -37,13 +37,13 @@
           <i data-lucide="database" class="w-6 h-6"></i>
         </div>
         <div>
-          <h1 class="text-lg font-bold text-slate-900">SQLD 1일차 데일리 복습</h1>
-          <p class="text-xs text-slate-500">데이터 모델링 & 엔터티 완벽 마스터</p>
+          <h1 class="text-lg font-bold text-slate-900">SQLD 4일차 데일리 복습</h1>
+          <p class="text-xs text-slate-500">문자/숫자 함수, IN 연산자, GROUP BY·HAVING, ROLLUP/CUBE</p>
         </div>
       </div>
       <div class="text-xs font-semibold px-3 py-1 bg-slate-100 text-slate-600 rounded-full flex items-center gap-1.5">
         <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
-        <span>1c15f3fa-4bcf-4652-becd-85860e55fc25_2026-07-11_SQLD_수업_1일차__.pdf 기준</span>
+        <span>2026-07-18_SQLD_(SQLPlus_CRUD_SQL_Developer_사용)_.pdf 기준</span>
       </div>
     </div>
   </header>
@@ -74,7 +74,7 @@
         </div>
         <div class="flex items-center space-x-2">
           <i data-lucide="hash" class="w-4 h-4 text-indigo-500"></i>
-          <span>데이터 모델링 & 엔터티 완벽 마스터</span>
+          <span>문자/숫자 함수, IN 연산자, GROUP BY·HAVING, ROLLUP/CUBE</span>
         </div>
         <div class="flex items-center space-x-2">
           <i data-lucide="refresh-cw" class="w-4 h-4 text-amber-500"></i>
@@ -237,7 +237,7 @@
   <footer class="bg-white border-t border-slate-200 py-6">
     <div class="max-w-4xl mx-auto px-4 text-center">
       <p class="text-xs text-slate-400 leading-relaxed">
-        본 복습 문항은 학습 정리 자료 <strong class="text-slate-600">1c15f3fa-4bcf-4652-becd-85860e55fc25_2026-07-11_SQLD_수업_1일차__.pdf</strong>를 기반으로 자체 제작되었습니다.
+        본 복습 문항은 학습 정리 자료 <strong class="text-slate-600">2026-07-18_SQLD_(SQLPlus_CRUD_SQL_Developer_사용)_.pdf</strong>를 기반으로 자체 제작되었습니다.
       </p>
       <p class="text-[10px] text-slate-300 mt-1">© 2026 SQLD Master Prep. All rights reserved.</p>
     </div>
@@ -247,124 +247,132 @@
   <script>
     const quizData = [
   {
-    "category": "데이터 모델링 개념",
-    "question": "데이터 모델링 시 가장 경계해야 하는 유의사항 중, 중복된 정보를 배제하고 한 곳에서만 관리하여 원천 데이터의 불일치 현상을 방지하고자 하는 모델링 원칙은 무엇인가?",
+    "category": "문자 함수 (UPPER/LOWER)",
+    "question": "아래 WORD_TEST1 테이블에 데이터를 입력한 후 쿼리를 실행하면 결과는?",
+    "code": "CREATE TABLE WORD_TEST1(STR VARCHAR2(50));\nINSERT INTO WORD_TEST1 VALUES('HELLO');\nINSERT INTO WORD_TEST1 VALUES('dbms');\n\nSELECT UPPER(STR) FROM WORD_TEST1;",
     "options": [
-      "유연성 (Flexibility)",
-      "유일성 (Uniqueness)",
-      "일관성 (Consistency)",
-      "안정성 (Stability)"
-    ],
-    "answer": 1,
-    "explanation": "'유일성(Uniqueness)'은 같은 정보는 오직 한 곳에서만 정의·관리하여 불필요한 중복 발생을 사전에 제거하는 원칙을 의미합니다. 일관성은 데이터가 모순되지 않고 논리적으로 일정한 상태를 유지해야 함을 나타냅니다."
-  },
-  {
-    "category": "모델링의 관점",
-    "question": "데이터 모델링의 세 가지 관점 중, '업무 과정에서 실제로 무엇(What)을 영구히 저장하고 비즈니스 흐름에서 구조화해야 하는가'를 기술하는 분석 관점은 무엇인가?",
-    "options": [
-      "데이터 관점 (Data View)",
-      "프로세스 관점 (Process View)",
-      "상관 관점 (Correlation View)",
-      "논리적 관점 (Logical View)"
+      "HELLO, DBMS",
+      "hello, dbms",
+      "Hello, Dbms",
+      "HELLO, dbms"
     ],
     "answer": 0,
-    "explanation": "모델링의 3대 관점 중 '데이터 관점'은 'What' 즉, 저장해야 하는 정보와 사물 자체를 분석하는 관점이며, '프로세스 관점'은 업무 상 실질적으로 수행하는 과정인 'How'에 중점을 둡니다. 상관 관점은 데이터와 프로세스 간의 연결관계를 연구합니다."
+    "explanation": "UPPER 함수는 문자열을 모두 대문자로 변환합니다. 'HELLO'는 이미 대문자라 그대로, 'dbms'는 'DBMS'로 변환되어 두 행 모두 대문자로 조회됩니다."
   },
   {
-    "category": "모델링 3단계",
-    "question": "데이터 모델링의 3단계 중, 정규화(Normalization)를 적극 수행하며 재사용성이 높고 비즈니스 요건이 명확히 상세화된 모델을 도출하는 단계이자, 특정 DBMS 장비에 대해 완전히 독립적인 독립성을 보장하는 단계는 무엇인가?",
+    "category": "ASCII 함수",
+    "question": "다음 쿼리의 실행 결과로 옳은 것은?",
+    "code": "SELECT ASCII('A') AS 대문자_A,\n       ASCII('a') AS 소문자_a,\n       ASCII('ABC') AS 여러글자\nFROM DUAL;",
     "options": [
-      "개념적 데이터 모델링",
-      "논리적 데이터 모델링",
-      "물리적 데이터 모델링",
-      "구조적 데이터 모델링"
+      "65, 97, 65",
+      "65, 97, 195 (ABC 전체 코드값의 합)",
+      "97, 65, 97",
+      "1, 1, 3 (문자 개수)"
+    ],
+    "answer": 0,
+    "explanation": "ASCII 함수는 문자 하나의 내부 코드 값을 반환합니다. 'A'는 65, 'a'는 97이며, 여러 글자가 입력되어도 오직 첫 번째 글자의 코드값만 반환하므로 'ABC'는 65가 됩니다."
+  },
+  {
+    "category": "TRIM 계열 함수",
+    "question": "아래 WORD_TEST5 테이블에 데이터를 입력한 후 쿼리를 실행하면 결과로 옳은 것은?",
+    "code": "CREATE TABLE WORD_TEST5(STR1 VARCHAR2(50), STR2 VARCHAR2(50));\nINSERT INTO WORD_TEST5 VALUES(' Oracle', ' DBMS');\n\nSELECT CONCAT(TRIM(STR1), TRIM(STR2)) FROM WORD_TEST5;",
+    "options": [
+      "'OracleDBMS' (공백 없이 결합)",
+      "' Oracle DBMS' (원래 공백 그대로 유지)",
+      "'Oracle DBMS' (사이 공백 하나만 유지)",
+      "타입 불일치로 오류 발생"
+    ],
+    "answer": 0,
+    "explanation": "TRIM은 문자열 양쪽 끝의 공백을 제거합니다. TRIM(' Oracle')='Oracle', TRIM(' DBMS')='DBMS'가 되고 이를 CONCAT으로 이어붙이면 공백 없이 'OracleDBMS'가 됩니다. TRIM 없이 CONCAT(STR1, STR2)만 쓰면 원래 공백이 그대로 포함됩니다."
+  },
+  {
+    "category": "LENGTH 함수",
+    "question": "아래 WORD_TEST4 테이블에 데이터를 입력한 후 쿼리를 실행하면 결과는?",
+    "code": "CREATE TABLE WORD_TEST4(STR1 VARCHAR2(50), STR2 VARCHAR2(50));\nINSERT INTO WORD_TEST4 VALUES('MyOracleDBMS', 'IReallyLikeOracle');\n\nSELECT LENGTH(STR1), LENGTH(STR2) FROM WORD_TEST4;",
+    "options": [
+      "12, 17",
+      "11, 16",
+      "12, 18",
+      "10, 17"
+    ],
+    "answer": 0,
+    "explanation": "LENGTH는 문자열의 길이를 반환합니다. 'MyOracleDBMS'는 12자, 'IReallyLikeOracle'는 17자이므로 결과는 12, 17입니다."
+  },
+  {
+    "category": "REPLACE 함수",
+    "question": "REPLACE 함수에서 세 번째 인자(바꿀 문자)를 생략했을 때의 동작으로 가장 옳은 것은?",
+    "code": "SELECT REPLACE(STR1, 'Oracle') FROM WORD_TEST5;  -- 세 번째 인자 없음",
+    "options": [
+      "문법 오류가 발생하여 쿼리가 실행되지 않는다.",
+      "찾은 문자열('Oracle')이 삭제(제거)된 결과가 반환된다.",
+      "찾은 문자열이 그대로 유지되고 아무 변화가 없다.",
+      "찾은 문자열이 NULL로 치환된다."
     ],
     "answer": 1,
-    "explanation": "정규화 단계를 수행하는 중간 지점은 '논리적 데이터 모델링'입니다. 특정 DBMS 기기에 의존하지 않으면서 가장 정교한 비즈니스 로직과 외래키 연관성을 완벽히 매핑하는 핵심적이고 독자적인 모델 설계 단계입니다."
+    "explanation": "REPLACE(문자열, 찾을문자, 바꿀문자)에서 바꿀문자를 생략하면 찾은 문자열을 제거(삭제)한 결과를 반환합니다. 이 특성은 CHR(10)(줄바꿈 문자)을 REPLACE로 제거해서 원래 길이와 비교해 줄바꿈 개수를 세는 용도로도 자주 활용됩니다."
   },
   {
-    "category": "ANSI-SPARC 구조",
-    "question": "ANSI-SPARC 3단계 구조 중, 데이터베이스의 전체적이고 통합된 논리 구조를 전사적인(Global) 관점에서 단 하나로 정교하게 기술하며, 사용자 데이터 관계 및 무결성 규칙을 선언하는 중심적 성격의 스키마는?",
+    "category": "IN 연산자 (튜플 비교)",
+    "question": "다음 조건과 동일한 의미를 갖는 것은?",
+    "code": "WHERE (A, B) IN ((1, 2), (3, 4))",
     "options": [
-      "외부 스키마 (External Schema)",
-      "물리 스키마 (Physical Schema)",
-      "내부 스키마 (Internal Schema)",
-      "개념 스키마 (Conceptual Schema)"
-    ],
-    "answer": 3,
-    "explanation": "개념 스키마(Conceptual Schema)는 통합 관점으로 모든 사용자의 데이터를 통합하여 전체 DB의 논리 구조를 기술하며 무결성 규칙을 포함하고 있습니다. 보통 전체 DB에 단 하나만 정의되는 시스템의 핵심입니다."
-  },
-  {
-    "category": "데이터 독립성",
-    "question": "다음 중 물리적 데이터 독립성(Physical Data Independence)이 올바르게 보장되었을 때 유도되는 아키텍처 상의 특징에 부합하는 설명은?",
-    "options": [
-      "테이블의 논리적 컬럼 구조가 추가되더라도 기존 사용자의 편의성을 위한 외부 뷰 스키마는 전혀 수정될 필요가 없다.",
-      "인덱스의 추가, 디스크 보관 경로 변경, 혹은 파티션 적용과 같이 실제 내부 저장 방식(내부 스키마)을 완전히 바꾸어도, 개념적 논리 구조(개념 스키마)에는 아무런 악영향을 유발하지 않는다.",
-      "하드웨어와 DBMS가 완전히 일치하여 두 계층이 긴밀하게 일관적인 물리적 디펜던시를 갖는다.",
-      "물리 저장 구조를 변경하면 반드시 모든 외부 뷰 단에서 수정을 연쇄적으로 반영해주어야 원천 에러를 회피할 수 있다."
+      "(A=1 OR B=2) OR (A=3 OR B=4)",
+      "(A=1 AND B=2) OR (A=3 AND B=4)",
+      "(A=1 AND B=2) AND (A=3 AND B=4)",
+      "(A=1 OR A=3) AND (B=2 OR B=4)"
     ],
     "answer": 1,
-    "explanation": "물리적 데이터 독립성은 내부 스키마(물리 저장 구조)가 전면 변경(디스크 이관, 인덱싱 재구축 등)되어도, 논리 구조인 개념 스키마가 전혀 영향을 받지 않는 것입니다. 1번 선택지는 논리적 데이터 독립성에 해당합니다."
+    "explanation": "여러 컬럼을 묶은 IN 조건은 튜플(행) 단위로 비교됩니다. 튜플 내부는 AND로, 튜플끼리는 OR로 연결되므로 (A,B) IN ((1,2),(3,4))는 (A=1 AND B=2) OR (A=3 AND B=4)와 동일한 의미입니다."
   },
   {
-    "category": "엔터티의 특징",
-    "question": "다음 중 업무적으로 중요한 정보를 담는 단위인 엔터티(Entity)가 반드시 가져야 하는 정체성적 특성으로 가장 옳지 않은 설명은?",
+    "category": "GROUP BY · HAVING",
+    "question": "아래 STUDENT 테이블(컴퓨터공학/전자공학/경영학 각 4명)의 학과별 평균 점수가 컴퓨터공학 85.25, 전자공학 84.25, 경영학 85.5일 때, 쿼리를 실행하면 결과에 포함되는 학과는 몇 개인가?",
+    "code": "SELECT DEPT, AVG(SCORE) AS AVG_SCORE\nFROM STUDENT\nGROUP BY DEPT\nHAVING AVG(SCORE) >= 85;",
     "options": [
-      "해당 업무 비즈니스 맥락에서 명확하게 필요로 하고 장기적으로 관리되어야 한다.",
-      "엔터티는 고유하게 실체를 식별할 수 있는 Primary Key 등의 식별자를 가질 수 있어야 한다.",
-      "유일성을 위해 한 번 테이블로 결정되면 영구적으로 존재하는 단 1개의 인스턴스(Instance) 레코드 구조를 가져야만 성립된다.",
-      "반드시 데이터 항목인 속성(Attribute)을 구성원으로서 보유하여야 하며 비즈니스 상에 가치 있는 의미를 포함한다."
+      "0개",
+      "1개 (경영학만)",
+      "2개 (컴퓨터공학, 경영학)",
+      "3개 (전체 학과)"
     ],
     "answer": 2,
-    "explanation": "엔터티는 무조건 2개 이상의 인스턴스(데이터 행)를 가져야 합니다. 만약 데이터가 단 1개의 인스턴스만 보관된다면 이는 독립된 엔터티로서 구축될 정체성 요건을 상실하여 성립되지 않습니다."
+    "explanation": "HAVING은 GROUP BY로 묶인 그룹에 조건을 거는 절입니다. 평균이 85 이상인 학과는 컴퓨터공학(85.25)과 경영학(85.5)이고, 전자공학(84.25)은 85 미만이라 제외되어 결과는 2개 학과입니다."
   },
   {
-    "category": "엔터티 실체 분류",
-    "question": "엔터티의 실체 형태(물리적 가시성)에 따라 분류할 때, 물리적 객체가 눈에 보이진 않지만 비즈니스 체계 내에서 추상적이자 장기 지속적으로 실존하며 존재의 타당성을 가지는 '개념적 무형 엔터티'의 구체적 조합인 것은?",
+    "category": "CASE WHEN 규칙",
+    "question": "SQL의 CASE WHEN 문에 대한 설명으로 가장 옳지 않은 것은?",
     "options": [
-      "사원, 고객, 차량, 부품",
-      "결제, 계약, 입고, 주문취소",
-      "계좌, 보험상품, 개설학과, 등록과목",
-      "배송지, 제조공장, 지점, 영수증"
+      "WHEN 조건은 위에서부터 순서대로 검사하며, 처음 만족하는 조건에서 결과를 내고 이후 조건은 검사하지 않는다.",
+      "ELSE 절은 필수가 아니라 선택 사항이다.",
+      "ELSE를 생략하고 어떤 WHEN 조건에도 해당하지 않으면 자동으로 0이 대입된다.",
+      "END 뒤에 별칭(AS)을 붙이지 않으면 컬럼명이 CASE 구문 그대로 길게 표시된다."
     ],
     "answer": 2,
-    "explanation": "실질적 물리 실체가 없지만 지속성을 확보하고 시스템 상에서 설계되는 '개념 엔터티(무형)'의 대표 사례로 계좌, 보험, 학과, 과목 등을 들 수 있습니다. 1번은 유형 엔터티, 2번은 실제 발생하는 행위에 연계되는 사건 엔터티(행위 엔터티)에 가깝습니다."
+    "explanation": "ELSE를 생략했을 때 어떤 조건에도 해당하지 않으면 0이 아니라 NULL이 대입됩니다. 나머지 설명(순서대로 검사 후 첫 매칭에서 종료, ELSE는 선택사항, 별칭 미지정 시 컬럼명이 길어짐)은 모두 옳습니다."
   },
   {
-    "category": "엔터티 발생시점 분류",
-    "question": "엔터티의 비즈니스 도출 시점에 따라 분류하는 3대 개념 중, '두 개 이상의 부모 기본 테이블로부터 유도되어 다량의 대용량 트랜잭션과 일시적인 프로세스 처리 및 흐름에 따라 활발하게 축적되며, 실제 운영 시 저장 용량이 가장 방대한 비중을 차지하는 것'은?",
+    "category": "ROLLUP 결과 해석",
+    "question": "아래 쿼리를 실행했을 때, 결과 행 중 'DEPT=경영학, GRADE=NULL'로 표시되는 행이 의미하는 것은?",
+    "code": "SELECT DEPT, GRADE, AVG(SCORE) AS AVG_SCORE\nFROM STUDENT\nGROUP BY ROLLUP(DEPT, GRADE);",
     "options": [
-      "기본 엔터티 (Base Entity)",
-      "중심 엔터티 (Main Entity)",
-      "행위 엔터티 (Action Entity)",
-      "종속 엔터티 (Dependent Entity)"
-    ],
-    "answer": 2,
-    "explanation": "엔터티 발생 분류 중 '행위 엔터티(Action Entity)'에 해당합니다. 프로세스나 상태 변화, 비즈니스 흐름 속에서 다수 부모 엔터티와의 연동을 거치며 실시간으로 데이터 볼륨이 극도로 늘어나는 특성을 보입니다."
-  },
-  {
-    "category": "ERD 작성 프로세스",
-    "question": "개체 관계 다이어그램인 ERD(Entity Relationship Diagram)를 작성해 나가는 단계적인 정석 작업 순서로 올바르게 표시된 것은?",
-    "options": [
-      "엔터티 도출 → 관계 설정 → 엔터티 배치 → 관계명 기술 → 관계 차수 설정 → 선택성 기재",
-      "엔터티 도출 → 엔터티 배치 → 관계 설정 → 관계명 기술 → 관계 차수 설정 → 선택사항 기술",
-      "엔터티 배치 → 엔터티 도출 → 관계 설정 → 관계 차수 설정 → 선택성 기재 → 관계명 기술",
-      "관계 설정 → 엔터티 도출 → 엔터티 배치 → 관계명 기술 → 선택사항 기술 → 관계 차수 설정"
+      "경영학 데이터 중 GRADE 값이 비어있는(결측) 데이터의 평균",
+      "경영학 전체(모든 학년을 합친) 평균 - 소계(Subtotal)",
+      "데이터베이스 오류로 표시되는 행이므로 무시해야 한다",
+      "전체 학과, 전체 학년을 통틀은 총계(Grand Total)"
     ],
     "answer": 1,
-    "explanation": "ERD 구축 순서는 다음과 같습니다: ① 엔터티 도출 → ② 엔터티 배치 → ③ 관계 설정 → ④ 관계명 기술 → ⑤ 관계 차수(1:N 등) 설정 → ⑥ 선택사항(필수/선택) 기술."
+    "explanation": "ROLLUP은 지정한 컬럼을 오른쪽부터 하나씩 제거하며 [DEPT+GRADE별] → [DEPT별] → [전체] 순으로 집계합니다. GRADE만 NULL로 표시된 행은 해당 DEPT의 소계(Subtotal)를 나타냅니다. DEPT와 GRADE가 모두 NULL인 행이라야 전체 총계에 해당합니다."
   },
   {
-    "category": "엔터티-속성-인스턴스",
-    "question": "다음 중 데이터 모델링의 중심 구성요소인 엔터티(Entity), 속성(Attribute), 인스턴스(Instance)의 특징과 상호 상관성에 대한 설명으로 가장 어긋난 것은?",
+    "category": "ROLLUP vs CUBE",
+    "question": "GROUP BY ROLLUP과 GROUP BY CUBE의 차이에 대한 설명으로 가장 옳은 것은?",
     "options": [
-      "속성은 엔터티의 가치를 더해주는 하위 세부 데이터 항목이며, 실제 테이블의 컬럼(Column) 구조로 완벽히 대응되어 매핑된다.",
-      "인스턴스는 설계된 엔터티 내 속성 항목들에 현실세계의 구체적인 데이터를 대입하여 가로 한 줄로 고유 식별되도록 삽입된 실제 로우(Row) 레코드를 가리킨다.",
-      "하나의 엔터티에는 최소한 1개의 인스턴스 정보만 존재해도 정규 구조상 오류 없이 성립하는 완벽한 엔터티로 판별한다.",
-      "엔터티가 도출되기 위해서는 현실 비즈니스 업무 흐름(Business Process)에서 해당 데이터를 실질적으로 활용하는 유의미함이 반드시 증명되어야 한다."
+      "ROLLUP은 지정한 컬럼 순서대로 계층적인 소계·총계만 만들고, CUBE는 지정한 컬럼들의 가능한 모든 조합에 대한 집계를 만든다.",
+      "CUBE는 ROLLUP보다 항상 결과 행 수가 적다.",
+      "ROLLUP과 CUBE는 완전히 동일한 결과를 반환하는 동의어 관계이다.",
+      "ROLLUP은 SELECT 절에서, CUBE는 WHERE 절에서만 사용할 수 있다."
     ],
-    "answer": 2,
-    "explanation": "'엔터티가 되려면?' 조건에 나와 있듯이, 엔터티로서 정상 판정되기 위해서는 반드시 '2개 이상의 인스턴스(데이터 레코드)'를 상주시켜야 합니다. 오직 단 1개의 인스턴스로 끝나는 정체성 없는 개념은 독립 개체(엔터티)로 인정하지 않습니다."
+    "answer": 0,
+    "explanation": "ROLLUP(DEPT, GRADE)은 [DEPT+GRADE] → [DEPT] → [전체] 순서로 계층적인 소계만 만드는 반면, CUBE(DEPT, GRADE)는 여기에 더해 학과와 무관한 학년별 전체 집계까지 포함한 모든 컬럼 조합의 집계를 만들어냅니다. 따라서 일반적으로 CUBE의 결과 행 수가 ROLLUP보다 같거나 많습니다."
   }
 ];
 

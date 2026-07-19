@@ -136,7 +136,10 @@
           </div>
 
           <!-- Question Body -->
-          <h2 class="text-lg sm:text-xl font-bold text-slate-900 mb-6 leading-relaxed" id="question-text"></h2>
+          <h2 class="text-lg sm:text-xl font-bold text-slate-900 mb-4 leading-relaxed" id="question-text"></h2>
+
+          <!-- SQL / Table code block (shown only when the question includes one) -->
+          <pre id="question-code" class="hidden mb-6 p-4 bg-slate-900 text-emerald-300 text-xs sm:text-sm rounded-xl overflow-x-auto font-mono leading-relaxed whitespace-pre"></pre>
 
           <!-- Options Form -->
           <div class="space-y-3" id="options-container">
@@ -261,6 +264,14 @@
       return min > 0 ? `${min}분 ${sec}초` : `${sec}초`;
     }
 
+    // SQL code blocks often contain <, >, & which must not be interpreted as HTML when injected via innerHTML
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
     // Per-question countdown: SQLD 실제 시험 페이스(90분/50문항 ≈ 1.5분)에 맞춘 문항당 제한시간
     const QUESTION_TIME_LIMIT_SEC = 90;
     let questionTimerInterval = null;
@@ -369,6 +380,15 @@
       document.getElementById('current-index-display').textContent = `문제 ${idx + 1} / ${quizData.length}`;
       document.getElementById('question-text').textContent = q.question;
 
+      // SQL / table code block (only some questions have one)
+      const codeEl = document.getElementById('question-code');
+      if (q.code) {
+        codeEl.textContent = q.code;
+        codeEl.classList.remove('hidden');
+      } else {
+        codeEl.classList.add('hidden');
+      }
+
       // Render Options
       const optionsContainer = document.getElementById('options-container');
       optionsContainer.innerHTML = '';
@@ -392,7 +412,7 @@
           }">
             <span class="text-xs font-bold">${optIdx + 1}</span>
           </div>
-          <p class="text-slate-700 font-medium text-sm leading-relaxed">${opt}</p>
+          <p class="text-slate-700 font-medium text-sm leading-relaxed">${escapeHtml(opt)}</p>
         `;
         optionsContainer.appendChild(optBtn);
       });
@@ -565,7 +585,7 @@
               }">
                 ${optIdx + 1}
               </div>
-              <span class="flex-grow pr-4">${opt}</span>
+              <span class="flex-grow pr-4">${escapeHtml(opt)}</span>
               ${statusBadge}
             </div>
           `;
@@ -586,7 +606,9 @@
             </div>
           </div>
 
-          <h4 class="text-sm sm:text-base font-bold text-slate-900 mb-4 leading-relaxed">${q.question}</h4>
+          <h4 class="text-sm sm:text-base font-bold text-slate-900 mb-4 leading-relaxed">${escapeHtml(q.question)}</h4>
+
+          ${q.code ? `<pre class="mb-4 p-4 bg-slate-900 text-emerald-300 text-xs sm:text-sm rounded-xl overflow-x-auto font-mono leading-relaxed whitespace-pre">${escapeHtml(q.code)}</pre>` : ''}
 
           <div class="space-y-2 mb-4">
             ${optionsHtml}
@@ -598,7 +620,7 @@
               <i data-lucide="lightbulb" class="w-4 h-4"></i>
               <span>정밀 출제 해설</span>
             </div>
-            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">${q.explanation}</p>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">${escapeHtml(q.explanation)}</p>
           </div>
         `;
 
